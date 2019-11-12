@@ -1,6 +1,6 @@
 My project is an fMRI study determining the effects of tonic heat pain and non-painful electric tonic current on cognitive task performance in healthy adults. Participants will attend two scans where they perform the task at baseline followed by one stimulus, and in the second session they will perform the task at baseline followed by the second stimulus. There are 4 runs per condition. Each run comprises of 6 blocks. In each block, 10 trials are presented. Each trial represents one of the letters in the word "TABLET", and trials will be divided into three types: primary, secondary, return. After each run, participants rate stimuli for "pain", "intensity", "salience", "unpleasantness", in that order. Task performance measures include reaction time, error rates, and ratings. The task will be presented on E-Prime.
 
-#The order of which stimulus will be given for each session will be counterbalanced.
+
 
 
 ############# DEFINE FUNCTIONS AND VARIABLES FOR THE EXPERIMENT #############
@@ -54,6 +54,7 @@ trial_type = ['Primary', 'Secondary', 'Return']  # the trial types
 can be run at different times / days. This program can be repeated 4 times,
 once per condition.
 """
+#The order of which stimulus will be given for each session will be counterbalanced.
 
 subject = input()  # input is a number
 even = (subject%2 ==0)  # what order to present conditions
