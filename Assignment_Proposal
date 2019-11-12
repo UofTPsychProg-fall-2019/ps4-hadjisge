@@ -1,0 +1,125 @@
+My project is an fMRI study determining the effects of tonic heat pain and non-painful electric tonic current on cognitive task performance in healthy adults. Participants will attend two scans where they perform the task at baseline followed by one stimulus, and in the second session they will perform the task at baseline followed by the second stimulus. There are 4 runs per condition. Each run comprises of 6 blocks. In each block, 10 trials are presented. Each trial represents one of the letters in the word "TABLET", and trials will be divided into three types: primary, secondary, return. After each run, participants rate stimuli for "pain", "intensity", "salience", "unpleasantness", in that order. Task performance measures include reaction time, error rates, and ratings. The task will be presented on E-Prime.
+
+#The order of which stimulus will be given for each session will be counterbalanced.
+
+
+############# DEFINE FUNCTIONS AND VARIABLES FOR THE EXPERIMENT #############
+
+#incrementing stimulus ratings on a 0-10 scale
+
+def get_value_in_range_and_time(low, high, maxtime)
+    """Get a value within a range and within a set time limit
+    there are only two buttons, so pressing the buttons increments or
+    decrements the value.
+    """
+    value = low  # start at low end
+    start_time = get_time()  # time
+
+    while get_time() < start_time + maxtime  # while within the maxtime
+        increment, _ = listen_to_keyboard(response_keys)
+        if increment == 1  # decrement
+            if value > low  # make sure not below `low`
+                value - 1
+        if increment == 2  # increment
+            if value < high  # make sure not above `high`
+                value + 1
+
+    return value
+
+
+############# DEFINE PARAMETERS AND VARIABLES FOR THE EXPERIMENT #############
+
+image_display_time = 500
+max_time_to_respond = 2000
+
+pain_max_time_to_respond = 6000
+other_ratings_max_time_to_respond = 10000
+ratings_range = [0, 10]
+
+response_keys = ['1', '2']
+conditions = ['baseline', 'elec', 'pain']  # the index order of the conditions
+
+
+letters = ['T', 'A', 'B', 'L', 'E', 'T']  # list of possible letters to display, T is more common
+len_letters = len(letters)  # length of letters possibility
+
+letter_images = read_directory('letters/*.png')  # 5 unique letter
+letter_images.append(letter_images[0])  # adding T to the end to match `letters`
+
+trial_type = ['Primary', 'Secondary', 'Return']  # the trial types
+
+
+########################## RUNNING THE EXPERIMENT ##########################
+"""There are 4 conditions and I make one table per condition since the conditions
+can be run at different times / days. This program can be repeated 4 times,
+once per condition.
+"""
+
+subject = input()  # input is a number
+even = (subject%2 ==0)  # what order to present conditions
+
+# determine the order of conditions
+if subject is even
+    stimulus_order = ['baseline', 'elec', 'baseline', 'pain']
+else
+    stimulus_order = ['baseline', 'pain', 'baseline', 'elec']
+
+    read_directory("welcome.png")
+
+    read_directory("task_instructions.png") 
+
+    read_directory("rating_intructions.png")
+
+for run in [1, 2, 3, 4]  # there are 4 runs per condition in an experiment
+
+    for block in [1, 2, 3, 4, 5, 6]  # 6 blocks per run
+
+        for trial in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]   # 10 trials per block
+
+            # determining the trial type
+            if trial <= 3
+                trial_type = 'Primary'
+            elif trial <= 7
+                trial_type = 'Secondary'
+            else
+                trial_type = 'Return'
+
+            # collect response during stimulus
+            start_time = get_time()  # start the clock
+            response, rt = listen_to_keyboard(response_keys)
+
+            # letter to display
+            index = random.randint(0, len_letters)  # randomly select the letter (by index)
+            letter = letters[index]  # get the letter from the list of letters
+            #   display image
+            display_image(letter_images[index], image_display_time)  # display the image of the letter
+
+            display_fixation(max_time_to_respond - image_display_time)  # an additional X ms in which to respond
+
+            # construct the times
+            click_time = rt - start_time  # the time difference between display and click
+            end_time = start_time + max_time_to_respond  # the trial window
+
+            # save
+            save(condition, run, block, trial, trial_type, letter, response,
+                 rt, start_time, click_time, end_time)
+
+    # collect ratings
+    ratings_time = get_time()  # want to record the time for the MRI analysis
+
+    read_directory("pain_rating.png")
+
+    # pain
+    pain, _ = listen_to_keyboard(response_keys)
+    if time > pain_max_time_to_respond
+        pain = 1
+
+    read_directory("intensity_rating.png")
+    read_directory("salience_rating.png")
+    read_directory("unpleasantness.png")
+
+    intensity = get_value_in_range_and_time(*ratings_range, other_ratings_max_time_to_respond)  # number btwn 0-10 in 10 seconds
+    salience = get_value_in_range_and_time(*ratings_range, other_ratings_max_time_to_respond)  # number btwn 0-10 in 10 seconds
+    unpleasantness = get_value_in_range_and_time(*ratings_range, other_ratings_max_time_to_respond)  # number btwn 0-10 in 10 seconds
+
+    save_rating(ratings_time, pain, intensity, salience, unpleasentness)  # goes back over all saved in last run and fills in the ratings columns
